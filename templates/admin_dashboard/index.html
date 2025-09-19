@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrePair Admin Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --accent: #3498db;
+            --light: #ecf0f1;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .navbar {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo-wrapper {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+        }
+        
+        .dashboard-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+            border: none;
+            transition: transform 0.2s;
+            margin-bottom: 24px;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .card-header {
+            background: white;
+            border-bottom: 1px solid #eaecef;
+            padding: 16px 20px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--primary);
+            border-radius: 8px 8px 0 0 !important;
+        }
+        
+        .stat-card {
+            padding: 20px;
+            text-align: center;
+            height: 100%;
+        }
+        
+        .stat-icon {
+            font-size: 1.8rem;
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 8px 0;
+        }
+        
+        .stat-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #7f8c8d;
+        }
+        
+        .form-control, .form-select {
+            padding: 12px 15px;
+            border-radius: 6px;
+            border: 1px solid #dcdfe6;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+        }
+        
+        .btn-primary {
+            background: var(--accent);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .table th {
+            font-weight: 600;
+            color: var(--primary);
+            border-top: none;
+            border-bottom: 2px solid #eaecef;
+            padding: 12px 15px;
+        }
+        
+        .table td {
+            padding: 12px 15px;
+            vertical-align: middle;
+        }
+        
+        .badge-demo {
+            background-color: #9b59b6;
+        }
+        
+        .badge-monthly {
+            background-color: #f39c12;
+        }
+        
+        .badge-yearly {
+            background-color: var(--success);
+        }
+        
+        .license-key {
+            font-family: 'Courier New', monospace;
+            background-color: #f8f9fa;
+            padding: 6px 10px;
+            border-radius: 4px;
+            border: 1px dashed #dee2e6;
+            font-size: 0.85rem;
+            color: var(--accent);
+        }
+        
+        .org-avatar {
+            width: 38px;
+            height: 38px;
+            background-color: var(--accent);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .content-header {
+            padding: 20px 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eaecef;
+        }
+        
+        .search-box {
+            position: relative;
+            max-width: 250px;
+        }
+        
+        .search-box .form-control {
+            padding-left: 40px;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #95a5a6;
+        }
+        
+        .main-content {
+            padding: 30px;
+        }
+        
+        .spinner-border {
+            width: 1.2rem;
+            height: 1.2rem;
+        }
+        
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+    <!-- Toast Notifications -->
+    <div class="toast-container"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <div class="logo-wrapper">
+                    <i class="bi bi-shield-check text-white"></i>
+                </div>
+                PrePair Admin Portal
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="bi bi-bell me-1"></i> Alerts</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="bi bi-question-circle me-1"></i> Support</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="bi bi-person-circle me-1"></i> Admin User</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-2 bg-white border-end" style="min-height: calc(100vh - 76px);">
+                <div class="p-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="bi bi-building me-2"></i> Organizations
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="bi bi-key me-2"></i> License Keys
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="bi bi-graph-up me-2"></i> Analytics
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="bi bi-gear me-2"></i> Settings
+                            </a>
+                        </li>
+                        <li class="nav-item mt-4">
+                            <a class="nav-link" href="#">
+                                <i class="bi bi-box-arrow-right me-2"></i> Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-10 main-content">
+                <!-- Content Header -->
+                <div class="content-header">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h2 class="mb-0">Dashboard Overview</h2>
+                            <p class="text-muted mb-0">Manage organizations and monitor system activity</p>
+                        </div>
+                        <div class="col-md-6 d-flex justify-content-end">
+                            <div class="search-box">
+                                <i class="bi bi-search"></i>
+                                <input type="text" class="form-control" id="searchInput" placeholder="Search organizations...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="dashboard-card stat-card">
+                            <div class="stat-icon">
+                                <i class="bi bi-building"></i>
+                            </div>
+                            <div class="stat-number" id="orgs-count">0</div>
+                            <div class="stat-title">Organizations</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="dashboard-card stat-card">
+                            <div class="stat-icon">
+                                <i class="bi bi-key"></i>
+                            </div>
+                            <div class="stat-number" id="active-licenses-count">0</div>
+                            <div class="stat-title">Active Licenses</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="dashboard-card stat-card">
+                            <div class="stat-icon">
+                                <i class="bi bi-people"></i>
+                            </div>
+                            <div class="stat-number">0</div>
+                            <div class="stat-title">Users</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="dashboard-card stat-card">
+                            <div class="stat-icon">
+                                <i class="bi bi-file-text"></i>
+                            </div>
+                            <div class="stat-number">0</div>
+                            <div class="stat-title">Exams Created</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Create Organization Form -->
+                    <div class="col-lg-5">
+                        <div class="dashboard-card mb-4">
+                            <div class="card-header">
+                                <i class="bi bi-plus-circle me-2"></i> Create New Organization
+                            </div>
+                            <div class="card-body">
+                                <form id="createOrgForm">
+                                    <div class="mb-3">
+                                        <label class="form-label">Organization ID</label>
+                                        <input type="text" class="form-control" name="org_id" placeholder="ORG-001" required>
+                                        <div class="form-text">Unique identifier for the organization</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Organization Name</label>
+                                        <input type="text" class="form-control" name="name" placeholder="Organization Name" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Contact Email</label>
+                                        <input type="email" class="form-control" name="contact_email" placeholder="admin@organization.edu">
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Subscription Tier</label>
+                                            <select class="form-select" name="tier" required>
+                                                <option value="">Select a tier</option>
+                                                <option value="demo">Demo</option>
+                                                <option value="monthly">Monthly</option>
+                                                <option value="yearly">Yearly</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">License Period</label>
+                                            <select class="form-select" name="period">
+                                                <option value="30">30 Days</option>
+                                                <option value="90">90 Days</option>
+                                                <option value="365" selected>1 Year</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">License Name</label>
+                                        <input type="text" class="form-control" name="license_name" placeholder="License Identifier" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="bi bi-plus-circle me-2"></i>Create Organization
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Organizations Table -->
+                    <div class="col-lg-7">
+                        <div class="dashboard-card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span><i class="bi bi-building me-2"></i> Organizations</span>
+                                <div>
+                                    <button class="btn btn-sm btn-outline-secondary" id="refreshBtn">
+                                        <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div id="loadingSpinner" class="text-center py-4">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                                <div id="orgTable" style="display: none;">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Organization</th>
+                                                    <th>Tier</th>
+                                                    <th>Status</th>
+                                                    <th>Dropbox</th>
+                                                    <th>Created</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="orgTableBody">
+                                                <!-- Data will be populated by JavaScript -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                        <div class="text-muted" id="pagination-info">Showing 0 of 0 organizations</div>
+                                        <nav>
+                                            <ul class="pagination mb-0" id="pagination">
+                                                <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+                                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                                <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                                            </ul>
+                                        </nav>
+                                    </div>
+                                </div>
+                                <div id="emptyState" class="text-center py-5" style="display: none;">
+                                    <i class="bi bi-inbox display-1 text-muted"></i>
+                                    <p class="text-muted mt-3">No organizations found. Create your first one!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables
+        let allOrganizations = [];
+        let filteredOrganizations = [];
+
+        // DOM Content Loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            loadOrganizations();
+            
+            // Add event listeners
+            document.getElementById('refreshBtn').addEventListener('click', loadOrganizations);
+            document.getElementById('searchInput').addEventListener('input', filterOrganizations);
+        });
+
+        // Show toast notification
+        function showToast(message, type = 'info') {
+            const toastContainer = document.querySelector('.toast-container');
+            const toastId = 'toast-' + Date.now();
+            
+            const toastEl = document.createElement('div');
+            toastEl.className = `toast align-items-center text-white bg-${type} border-0`;
+            toastEl.setAttribute('role', 'alert');
+            toastEl.setAttribute('aria-live', 'assertive');
+            toastEl.setAttribute('aria-atomic', 'true');
+            toastEl.id = toastId;
+            
+            toastEl.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            `;
+            
+            toastContainer.appendChild(toastEl);
+            
+            const toast = new bootstrap.Toast(toastEl);
+            toast.show();
+            
+            // Remove toast from DOM after it's hidden
+            toastEl.addEventListener('hidden.bs.toast', function() {
+                toastEl.remove();
+            });
+        }
+
+        // Load organizations from API
+        async function loadOrganizations() {
+            showLoading();
+            
+            try {
+                const response = await fetch('/admin/api/organizations');
+                const result = await response.json();
+                
+                if (result.success) {
+                    allOrganizations = result.organizations;
+                    filteredOrganizations = [...allOrganizations];
+                    
+                    updateStats();
+                    renderOrganizations();
+                    
+                    document.getElementById('loadingSpinner').style.display = 'none';
+                    
+                    if (allOrganizations.length > 0) {
+                        document.getElementById('orgTable').style.display = 'block';
+                        document.getElementById('emptyState').style.display = 'none';
+                    } else {
+                        document.getElementById('orgTable').style.display = 'none';
+                        document.getElementById('emptyState').style.display = 'block';
+                    }
+                } else {
+                    console.error('Failed to load organizations:', result.error);
+                    showToast('Error loading organizations: ' + result.error, 'danger');
+                    showEmptyState();
+                }
+            } catch (error) {
+                console.error('Error loading organizations:', error);
+                showToast('Error loading organizations. Check console for details.', 'danger');
+                showEmptyState();
+            }
+        }
+
+        // Update stats cards
+        function updateStats() {
+            document.getElementById('orgs-count').textContent = allOrganizations.length;
+            
+            // Count active licenses (assuming active status is indicated by subscription_status)
+            const activeLicenses = allOrganizations.filter(org => 
+                org.subscription_status && org.subscription_status.toLowerCase() === 'active'
+            ).length;
+            
+            document.getElementById('active-licenses-count').textContent = activeLicenses;
+        }
+
+        // Render organizations table
+        function renderOrganizations() {
+            const tbody = document.getElementById('orgTableBody');
+            tbody.innerHTML = '';
+            
+            filteredOrganizations.forEach(org => {
+                const tr = document.createElement('tr');
+                
+                // Get first letter for avatar
+                const firstLetter = org.name ? org.name.charAt(0).toUpperCase() : 'O';
+                
+                // Determine badge class based on tier
+                let badgeClass = 'badge bg-secondary';
+                if (org.subscription_tier === 'demo') badgeClass = 'badge-demo';
+                else if (org.subscription_tier === 'monthly') badgeClass = 'badge-monthly';
+                else if (org.subscription_tier === 'yearly') badgeClass = 'badge-yearly';
+                
+                // Determine status badge
+                let statusBadgeClass = 'bg-secondary';
+                let statusText = org.subscription_status || 'unknown';
+                
+                if (org.subscription_status) {
+                    const status = org.subscription_status.toLowerCase();
+                    if (status === 'active') statusBadgeClass = 'bg-success';
+                    else if (status === 'pending') statusBadgeClass = 'bg-warning text-dark';
+                    else if (status === 'expired' || status === 'suspended') statusBadgeClass = 'bg-danger';
+                }
+                
+                // Format created date
+                let createdDate = 'N/A';
+                if (org.created_at) {
+                    const date = new Date(org.created_at);
+                    createdDate = date.toLocaleDateString();
+                }
+                
+                tr.innerHTML = `
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="org-avatar me-3">${firstLetter}</div>
+                            <div>
+                                <div class="fw-bold">${org.name || 'Unnamed Organization'}</div>
+                                <div class="small text-muted">${org.org_id || 'No ID'}</div>
+                                <div class="small text-muted">${org.contact_email || 'No email'}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="badge ${badgeClass}">${org.subscription_tier || 'N/A'}</span></td>
+                    <td><span class="badge ${statusBadgeClass}">${statusText}</span></td>
+                    <td>
+                        <span class="badge ${org.dropbox_connected ? 'bg-success' : 'bg-secondary'}">
+                            ${org.dropbox_connected ? 'Connected' : 'Not Connected'}
+                        </span>
+                    </td>
+                    <td>${createdDate}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                    </td>
+                `;
+                
+                tbody.appendChild(tr);
+            });
+            
+            // Update pagination info
+            document.getElementById('pagination-info').textContent = 
+                `Showing ${filteredOrganizations.length} of ${allOrganizations.length} organizations`;
+        }
+
+        // Filter organizations based on search input
+        function filterOrganizations() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            if (!searchTerm) {
+                filteredOrganizations = [...allOrganizations];
+            } else {
+                filteredOrganizations = allOrganizations.filter(org => 
+                    (org.name && org.name.toLowerCase().includes(searchTerm)) ||
+                    (org.org_id && org.org_id.toLowerCase().includes(searchTerm)) ||
+                    (org.contact_email && org.contact_email.toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            renderOrganizations();
+        }
+
+        // Show loading state
+        function showLoading() {
+            document.getElementById('loadingSpinner').style.display = 'block';
+            document.getElementById('orgTable').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'none';
+        }
+
+        // Show empty state
+        function showEmptyState() {
+            document.getElementById('loadingSpinner').style.display = 'none';
+            document.getElementById('orgTable').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'block';
+        }
+
+        // Handle form submission
+        document.getElementById('createOrgForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner-border spinner-border-sm me-2"></div> Creating...';
+
+            try {
+                const response = await fetch('/admin/api/organizations', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showToast(`Organization "${data.name}" created successfully!`, 'success');
+                    e.target.reset();
+                    await loadOrganizations(); // Reload the organizations list
+                } else {
+                    showToast('Failed to create organization: ' + result.error, 'danger');
+                }
+            } catch (error) {
+                console.error('Error creating organization:', error);
+                showToast('Error creating organization. Check console for details.', 'danger');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-plus-circle me-2"></i>Create Organization';
+            }
+        });
+    </script>
+</body>
+</html>
