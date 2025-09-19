@@ -22,6 +22,7 @@
             font-family: 'Segoe UI', 'Roboto', sans-serif;
             color: #333;
             line-height: 1.6;
+            overflow-x: hidden;
         }
         
         .navbar {
@@ -155,6 +156,17 @@
             border: 1px dashed #dee2e6;
             font-size: 0.85rem;
             color: var(--accent);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-block;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .license-key:hover {
+            background-color: #e9ecef;
         }
         
         .org-avatar {
@@ -194,7 +206,7 @@
         }
         
         .main-content {
-            padding: 30px;
+            padding: 20px;
         }
         
         .spinner-border {
@@ -208,11 +220,75 @@
             right: 20px;
             z-index: 9999;
         }
+        
+        .copy-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--success);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 9999;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        
+        .copy-notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+        }
+        
+        .table-section {
+            margin-top: 20px;
+        }
+        
+        .stats-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .stat-card {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .stat-card {
+                min-width: 100%;
+            }
+            
+            .main-content {
+                padding: 15px;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .main-content-area {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
     <!-- Toast Notifications -->
     <div class="toast-container"></div>
+    
+    <!-- Copy Notification -->
+    <div class="copy-notification" id="copyNotification">
+        <i class="bi bi-check-circle-fill me-2"></i> License key copied to clipboard!
+    </div>
 
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark">
@@ -245,7 +321,7 @@
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
-            <div class="col-lg-2 bg-white border-end" style="min-height: calc(100vh - 76px);">
+            <div class="col-lg-2 bg-white border-end sidebar" style="min-height: calc(100vh - 76px);">
                 <div class="p-3">
                     <ul class="nav flex-column">
                         <li class="nav-item">
@@ -283,26 +359,26 @@
             </div>
 
             <!-- Main Content -->
-            <div class="col-lg-10 main-content">
-                <!-- Content Header -->
-                <div class="content-header">
-                    <div class="row align-items-center">
-                        <div class="col-md-6">
-                            <h2 class="mb-0">Dashboard Overview</h2>
-                            <p class="text-muted mb-0">Manage organizations and monitor system activity</p>
-                        </div>
-                        <div class="col-md-6 d-flex justify-content-end">
-                            <div class="search-box">
-                                <i class="bi bi-search"></i>
-                                <input type="text" class="form-control" id="searchInput" placeholder="Search organizations...">
+            <div class="col-lg-10 main-content-area">
+                <div class="main-content">
+                    <!-- Content Header -->
+                    <div class="content-header">
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <h2 class="mb-0">Dashboard Overview</h2>
+                                <p class="text-muted mb-0">Manage organizations and monitor system activity</p>
+                            </div>
+                            <div class="col-md-6 d-flex justify-content-end">
+                                <div class="search-box">
+                                    <i class="bi bi-search"></i>
+                                    <input type="text" class="form-control" id="searchInput" placeholder="Search organizations...">
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Stats Cards -->
-                <div class="row mb-4">
-                    <div class="col-md-3">
+                    <!-- Stats Cards -->
+                    <div class="stats-row">
                         <div class="dashboard-card stat-card">
                             <div class="stat-icon">
                                 <i class="bi bi-building"></i>
@@ -310,8 +386,6 @@
                             <div class="stat-number" id="orgs-count">0</div>
                             <div class="stat-title">Organizations</div>
                         </div>
-                    </div>
-                    <div class="col-md-3">
                         <div class="dashboard-card stat-card">
                             <div class="stat-icon">
                                 <i class="bi bi-key"></i>
@@ -319,8 +393,6 @@
                             <div class="stat-number" id="active-licenses-count">0</div>
                             <div class="stat-title">Active Licenses</div>
                         </div>
-                    </div>
-                    <div class="col-md-3">
                         <div class="dashboard-card stat-card">
                             <div class="stat-icon">
                                 <i class="bi bi-people"></i>
@@ -328,8 +400,6 @@
                             <div class="stat-number">0</div>
                             <div class="stat-title">Users</div>
                         </div>
-                    </div>
-                    <div class="col-md-3">
                         <div class="dashboard-card stat-card">
                             <div class="stat-icon">
                                 <i class="bi bi-file-text"></i>
@@ -338,29 +408,35 @@
                             <div class="stat-title">Exams Created</div>
                         </div>
                     </div>
-                </div>
 
-                <div class="row">
-                    <!-- Create Organization Form -->
-                    <div class="col-lg-5">
-                        <div class="dashboard-card mb-4">
+                    <!-- Create Organization Form Section -->
+                    <div class="form-section">
+                        <div class="dashboard-card">
                             <div class="card-header">
                                 <i class="bi bi-plus-circle me-2"></i> Create New Organization
                             </div>
                             <div class="card-body">
                                 <form id="createOrgForm">
-                                    <div class="mb-3">
-                                        <label class="form-label">Organization ID</label>
-                                        <input type="text" class="form-control" name="org_id" placeholder="ORG-001" required>
-                                        <div class="form-text">Unique identifier for the organization</div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Organization ID</label>
+                                            <input type="text" class="form-control" name="org_id" placeholder="ORG-001" required>
+                                            <div class="form-text">Unique identifier for the organization</div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Organization Name</label>
+                                            <input type="text" class="form-control" name="name" placeholder="Organization Name" required>
+                                        </div>
                                     </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Organization Name</label>
-                                        <input type="text" class="form-control" name="name" placeholder="Organization Name" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Contact Email</label>
-                                        <input type="email" class="form-control" name="contact_email" placeholder="admin@organization.edu">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Contact Email</label>
+                                            <input type="email" class="form-control" name="contact_email" placeholder="admin@organization.edu">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">License Name</label>
+                                            <input type="text" class="form-control" name="license_name" placeholder="License Identifier" required>
+                                        </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
@@ -381,10 +457,6 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">License Name</label>
-                                        <input type="text" class="form-control" name="license_name" placeholder="License Identifier" required>
-                                    </div>
                                     <button type="submit" class="btn btn-primary w-100">
                                         <i class="bi bi-plus-circle me-2"></i>Create Organization
                                     </button>
@@ -393,8 +465,8 @@
                         </div>
                     </div>
 
-                    <!-- Organizations Table -->
-                    <div class="col-lg-7">
+                    <!-- Organizations Table Section -->
+                    <div class="table-section">
                         <div class="dashboard-card">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <span><i class="bi bi-building me-2"></i> Organizations</span>
@@ -417,6 +489,7 @@
                                                 <tr>
                                                     <th>Organization</th>
                                                     <th>Tier</th>
+                                                    <th>License Key</th>
                                                     <th>Status</th>
                                                     <th>Dropbox</th>
                                                     <th>Created</th>
@@ -496,6 +569,27 @@
             toastEl.addEventListener('hidden.bs.toast', function() {
                 toastEl.remove();
             });
+        }
+
+        // Show copy notification
+        function showCopyNotification() {
+            const notification = document.getElementById('copyNotification');
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 2000);
+        }
+
+        // Generate a random license key for demonstration
+        function generateLicenseKey() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let key = 'PREP-';
+            for (let i = 0; i < 8; i++) {
+                key += chars.charAt(Math.floor(Math.random() * chars.length));
+                if (i === 3) key += '-';
+            }
+            return key;
         }
 
         // Load organizations from API
@@ -581,6 +675,12 @@
                     createdDate = date.toLocaleDateString();
                 }
                 
+                // Generate a license key for demonstration
+                // In a real application, this would come from your backend
+                const licenseKey = org.current_license_key_id ? 
+                    generateLicenseKey() : 
+                    '<span class="text-muted">No license</span>';
+                
                 tr.innerHTML = `
                     <td>
                         <div class="d-flex align-items-center">
@@ -593,6 +693,11 @@
                         </div>
                     </td>
                     <td><span class="badge ${badgeClass}">${org.subscription_tier || 'N/A'}</span></td>
+                    <td>
+                        <span class="license-key" onclick="copyToClipboard(this)">
+                            ${licenseKey}
+                        </span>
+                    </td>
                     <td><span class="badge ${statusBadgeClass}">${statusText}</span></td>
                     <td>
                         <span class="badge ${org.dropbox_connected ? 'bg-success' : 'bg-secondary'}">
@@ -601,8 +706,11 @@
                     </td>
                     <td>${createdDate}</td>
                     <td>
-                        <button class="btn btn-sm btn-outline-primary">
+                        <button class="btn btn-sm btn-outline-primary me-1">
                             <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-trash"></i>
                         </button>
                     </td>
                 `;
@@ -613,6 +721,17 @@
             // Update pagination info
             document.getElementById('pagination-info').textContent = 
                 `Showing ${filteredOrganizations.length} of ${allOrganizations.length} organizations`;
+        }
+
+        // Copy license key to clipboard
+        function copyToClipboard(element) {
+            const text = element.textContent.replace(/<[^>]*>/g, ''); // Remove any HTML tags
+            navigator.clipboard.writeText(text).then(() => {
+                showCopyNotification();
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                showToast('Failed to copy license key', 'danger');
+            });
         }
 
         // Filter organizations based on search input
